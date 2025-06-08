@@ -9,8 +9,21 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddScoped<BookingService>();
-builder.Services.AddDbContext<DataContext>(x => x.UseSqlServer(builder.Configuration.GetConnectionString("BookingDatabaseConnection")));
 
+
+var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings-DefaultConnection2");
+builder.Services.AddDbContext<DataContext>(x => x.UseSqlServer(connectionString));
+
+//builder.Services.AddDbContext<DataContext>(x => x.UseSqlServer(builder.Configuration.GetConnectionString("BookingDatabaseConnection")));
+
+
+
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowAll",
+        policy => policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+});
 var app = builder.Build();
 
 
@@ -23,5 +36,10 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+
+
+app.UseCors("AllowAll");
+
 
 app.Run();
